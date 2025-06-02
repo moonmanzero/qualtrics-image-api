@@ -1,13 +1,15 @@
 from flask import Flask, request, jsonify
-import openai
 import os
+import traceback
 from flask_cors import CORS
-import traceback  # for full error logs
+from openai import OpenAI
 
+# Initialize Flask app
 app = Flask(__name__)
 CORS(app)
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Initialize OpenAI client (uses OPENAI_API_KEY from environment)
+client = OpenAI()
 
 @app.route('/generate-image', methods=['POST'])
 def generate_image():
@@ -16,21 +18,19 @@ def generate_image():
     print(f"Received prompt: {prompt}")
 
     try:
-        response = openai.Image.create(
+        response = client.images.generate(
+            model="dall-e-2",  # or "dall-e-3" if you're approved for it
             prompt=prompt,
-            n=1,
-            size="512x512"
+            size="512x512",
+            n=1
         )
         print("OpenAI response:", response)
-        image_url = response['data'][0]['url']
+        image_url = response.data[0].url
         return jsonify({'imageUrl': image_url})
     except Exception as e:
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
-import os
-
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 10000))  # Render sets PORT automatically
+    port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port, debug=True)
-
