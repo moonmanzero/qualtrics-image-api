@@ -1,14 +1,12 @@
 from flask import Flask, request, jsonify
-import os
-import traceback
 from flask_cors import CORS
 from openai import OpenAI
+import os
+import traceback
 
-# Initialize Flask app
 app = Flask(__name__)
 CORS(app)
 
-# Initialize OpenAI client (uses OPENAI_API_KEY from environment)
 client = OpenAI()
 
 @app.route('/generate-image', methods=['POST'])
@@ -18,15 +16,21 @@ def generate_image():
     print(f"Received prompt: {prompt}")
 
     try:
-        response = client.images.generate(
-            model="dall-e-2",  # or "dall-e-3" if you're approved for it
-            prompt=prompt,
-            size="512x512",
-            n=1
+        # Send the request using chat/completions and gpt-image-1
+        response = client.chat.completions.create(
+            model="gpt-image-1",
+            messages=[
+                {"role": "user", "content": f"Generate an image of: {prompt}"}
+            ]
         )
-        print("OpenAI response:", response)
-        image_url = response.data[0].url
-        return jsonify({'imageUrl': image_url})
+
+        # Extract image URL from the message content
+        content = response.choices[0].message.content
+        print("GPT response content:", content)
+
+        # Assume content is just the image URL (which it typically is)
+        return jsonify({'imageUrl': content.strip()})
+
     except Exception as e:
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
