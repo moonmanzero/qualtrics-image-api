@@ -4,8 +4,9 @@ import os
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # Allows calls from Qualtrics
+CORS(app)
 
+# Set OpenAI API key from environment variable
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.route('/generate-image', methods=['POST'])
@@ -25,4 +26,4 @@ def generate_image():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)
+    app.run(debug=True)
