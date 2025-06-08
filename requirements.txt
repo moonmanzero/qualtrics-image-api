@@ -1,3 +1,5 @@
 flask
-flask-cors
 openai
+flask-cors
+requests
+boto3
