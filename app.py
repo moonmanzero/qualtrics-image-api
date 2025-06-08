@@ -65,8 +65,7 @@ def generate_image():
             Bucket=S3_BUCKET_NAME,
             Key=file_name,
             Body=image_data,
-            ContentType='image/png',
-            ACL='public-read'
+            ContentType='image/png'
         )
         logging.info("STEP 3 SUCCESS: Image uploaded to S3.")
 
